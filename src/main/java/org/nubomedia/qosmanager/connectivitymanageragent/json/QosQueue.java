@@ -6,10 +6,10 @@ import javax.persistence.Id;
 /**
  * Created by maa on 10.11.15.
  */
-@Entity
+//@Entity
 public class QosQueue {
 
-    @Id
+//    @Id
     private String queue_uuid;
     private QosQueueValues rates;
     private String id;

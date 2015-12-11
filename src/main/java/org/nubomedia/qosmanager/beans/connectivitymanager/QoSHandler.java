@@ -28,10 +28,9 @@ public class QoSHandler {
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
-    public List<Server> createQueues(List<QoSAllocation> queues){
+    public List<Server> createQueues(Host hostMap, List<QoSAllocation> queues){
 
         logger.debug("received request for " + queues.toString());
-        Host hostMap = requestor.getHost();
 
         List<ServerQoS> queuesReq = new ArrayList<>();
         List<Server> servers = new ArrayList<>();
@@ -98,7 +97,7 @@ public class QoSHandler {
         return serverIface;
     }
 
-    public void removeQueues(List<String> serverIds){
+    public void removeQos(Host hostMap, List<String> serverIds){
 
 
 

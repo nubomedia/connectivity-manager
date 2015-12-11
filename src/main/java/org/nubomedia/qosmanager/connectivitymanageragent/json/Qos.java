@@ -6,12 +6,12 @@ import java.util.List;
 /**
  * Created by maa on 04.11.15.
  */
-@Entity
+//@Entity
 public class Qos {
 
-    @Id
+//    @Id
     private String qos_uuid;
-    @OneToMany(targetEntity = QosQueue.class,cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+//    @OneToMany(targetEntity = QosQueue.class,cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<QosQueue> queues;
 
     public Qos() {

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import org.nubomedia.qosmanager.openbaton.OpenbatonEvent;
 import org.nubomedia.qosmanager.utils.ConfigReader;
+import org.nubomedia.qosmanager.utils.ConfigurationBeans;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 import org.openbaton.catalogue.mano.record.VirtualLinkRecord;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
@@ -30,8 +31,10 @@ public class OpenbatonEventSubscription {
     private NFVORequestor requestor;
     private Logger logger;
     private Properties properties;
-    @Autowired QoSCreator creator;
-    @Autowired private Gson mapper;
+    @Autowired
+    QoSCreator creator;
+    @Autowired
+    private Gson mapper;
 
 
     @PostConstruct
@@ -39,41 +42,45 @@ public class OpenbatonEventSubscription {
 
         this.properties = ConfigReader.readProperties();
         this.logger = LoggerFactory.getLogger(this.getClass());
-        this.requestor = new NFVORequestor(properties.getProperty("nfvo.username"),properties.getProperty("nfvo.password"),properties.getProperty("nfvo.baseURL"),properties.getProperty("nfvo.basePort"),"1");
+        this.requestor = new NFVORequestor(properties.getProperty("nfvo.username"), properties.getProperty("nfvo.password"), properties.getProperty("nfvo.baseURL"), properties.getProperty("nfvo.basePort"), "1");
 
         EventEndpoint eventEndpoint = new EventEndpoint();
         eventEndpoint.setType(EndpointType.RABBIT);
+        eventEndpoint.setEvent(Action.INSTANTIATE_FINISH);
+        eventEndpoint.setEndpoint(ConfigurationBeans.queueName_eventInstatiateFinish);
+        eventEndpoint.setName("eventNSRCreated");
         requestor.getEventAgent().create(eventEndpoint);
 
     }
 
-    public void receiveNewNsr(String message){
+    public void receiveNewNsr(String message) {
         logger.info("received new event " + message);
         OpenbatonEvent evt;
 
         try {
             logger.debug("Trying to deserialize it");
             evt = mapper.fromJson(message, OpenbatonEvent.class);
-        }
-        catch (JsonParseException e) {
-            logger.info("Error in payload, expected NSR " + e.getMessage());
+        } catch (JsonParseException e) {
+            if (logger.isDebugEnabled() || logger.isTraceEnabled())
+                logger.warn("Error in payload, expected NSR ", e);
+            else
+                logger.warn("Error in payload, expected NSR " + e.getMessage());
             return;
         }
 
 
         NetworkServiceRecord nsr = evt.getPayload();
 
-        for (VirtualNetworkFunctionRecord vnfr : nsr.getVnfr()){
+        for (VirtualNetworkFunctionRecord vnfr : nsr.getVnfr()) {
 
-            for (VirtualLinkRecord vlr : vnfr.getConnected_external_virtual_link()){
-                if(!vlr.getQos().isEmpty()){
-                    for(String qosAttr : vlr.getQos()){
-                        if(qosAttr.contains("minimum_bandwith")){
-                            if(evt.getAction().equals(Action.INSTANTIATE_FINISH)){
-                                creator.addQos(nsr.getVnfr(),nsr.getId());
-                            }
-                            else if (evt.getAction().equals(Action.RELEASE_RESOURCES_FINISH)){
-                                creator.removeQos(nsr.getVnfr(),nsr.getId());
+            for (VirtualLinkRecord vlr : vnfr.getConnected_external_virtual_link()) {
+                if (!vlr.getQos().isEmpty()) {
+                    for (String qosAttr : vlr.getQos()) {
+                        if (qosAttr.contains("minimum_bandwith")) {
+                            if (evt.getAction().equals(Action.INSTANTIATE_FINISH)) {
+                                creator.addQos(nsr.getVnfr(), nsr.getId());
+                            } else if (evt.getAction().equals(Action.RELEASE_RESOURCES_FINISH)) {
+                                creator.removeQos(nsr.getVnfr(), nsr.getId());
                             }
                         }
 
@@ -82,10 +89,6 @@ public class OpenbatonEventSubscription {
             }
 
         }
-
-
-
-
 
 
     }

@@ -29,6 +29,7 @@ import javax.annotation.PostConstruct;
 @ComponentScan("org.nubomedia.qosmanager")
 public class ConfigurationBeans {
 
+    public static final String queueName_eventInstatiateFinish = "nfvo.qos.nsr-events";
     private Logger logger;
     @Autowired private Environment env;
 
@@ -62,7 +63,7 @@ public class ConfigurationBeans {
     @Bean
     public Queue getCreationQueue(){
         logger.debug("Created Queue for NSR event");
-        return new Queue("nsr-events",false);
+        return new Queue(queueName_eventInstatiateFinish,false,false,true);
     }
 
     @Bean

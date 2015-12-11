@@ -8,12 +8,12 @@ import javax.persistence.Id;
 /**
  * Created by maa on 24.11.15.
  */
-@Entity
+//@Entity
 public class InterfaceQoS {
 
-    @Id
-    @Expose(serialize = false, deserialize = false)
-    private String id;
+//    @Id
+//    @Expose(serialize = false, deserialize = false)
+//    private String id;
     private String ip;
     private String ovs_port_number;
     private Qos qos;
@@ -27,13 +27,13 @@ public class InterfaceQoS {
     public InterfaceQoS() {
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+//    public String getId() {
+//        return id;
+//    }
+//
+//    public void setId(String id) {
+//        this.id = id;
+//    }
 
     public String getIp() {
         return ip;
