@@ -51,7 +51,11 @@ public class ConnectivityManagerHandler {
         this.hostMap = requestor.getHost();
     }
 
-    public boolean removeQoS(){
+    public boolean removeQoS(List<String> servers,String nsrID){
+
+        queueHandler.removeQos(hostMap,internalData.get(nsrID),servers);
+        flowsHandler.removeFlows(hostMap,servers,internalData.get(nsrID));
+        internalData.remove(nsrID);
         return true;
     }
 

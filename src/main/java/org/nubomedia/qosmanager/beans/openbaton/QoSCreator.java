@@ -52,6 +52,30 @@ public class QoSCreator {
 
     public void removeQos(Set<VirtualNetworkFunctionRecord> vnfrs,String nsrId){
 
+        List<String> servers = this.getServersWithQoS(vnfrs);
+        logger.debug("remmoving qos for nsr " + nsrId + " with vnfrs: " + vnfrs);
+        boolean ressponse = handler.removeQoS(servers,nsrId);
+
+    }
+
+    private  List<String> getServersWithQoS(Set<VirtualNetworkFunctionRecord> vnfrs){
+        List<String> res = new ArrayList<>();
+
+        Map<String, Quality> qualities = this.getVlrs(vnfrs);
+
+        for (VirtualNetworkFunctionRecord vnfr : vnfrs){
+            for (VirtualDeploymentUnit vdu : vnfr.getVdu()){
+                for (VNFCInstance vnfcInstance : vdu.getVnfc_instance()){
+                    for (VNFDConnectionPoint connectionPoint : vnfcInstance.getConnection_point()){
+                        if (qualities.keySet().contains(connectionPoint.getVirtual_link_reference())){
+                            res.add(vnfcInstance.getHostname());
+                        }
+                    }
+                }
+            }
+        }
+
+        return res;
     }
 
     private List<QoSAllocation> getQoses(Set<VirtualNetworkFunctionRecord> vnfrs) {

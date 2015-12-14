@@ -64,4 +64,16 @@ public class FlowHandler {
         logger.debug("Returning flows " + returningFlows.toString());
     }
 
+    public void removeFlows(Host hostmap, List<String> serversIds, List<Server> servers){
+
+        for(Server server : servers){
+            if (serversIds.contains(server.getName())){
+                String hypervisor = hostmap.belongsTo(server.getName());
+                for  (InterfaceQoS iface : server.getInterfaces()){
+                    requestor.deleteFlow(hypervisor,protocol,iface.getIp());
+                }
+            }
+        }
+    }
+
 }

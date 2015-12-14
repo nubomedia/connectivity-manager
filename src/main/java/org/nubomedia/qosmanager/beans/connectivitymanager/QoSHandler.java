@@ -97,9 +97,22 @@ public class QoSHandler {
         return serverIface;
     }
 
-    public void removeQos(Host hostMap, List<String> serverIds){
+    public void removeQos(Host hostMap, List<Server> servers, List<String> serverIds){
 
-
+        for (Server server :servers){
+            if (serverIds.contains(server.getName())){
+                String hypervisor = hostMap.belongsTo(server.getName());
+                for (InterfaceQoS iface : server.getInterfaces()){
+                    Qos ifaceQoS = iface.getQos();
+                    if (!ifaceQoS.getQueues().isEmpty()){
+                        for(QosQueue queue : ifaceQoS.getQueues()){
+                            requestor.delQueue(hypervisor,ifaceQoS.getQos_uuid(),queue.getUuid(),queue.getId());
+                        }
+                    }
+                    requestor.delQos(hypervisor,ifaceQoS.getQos_uuid());
+                }
+            }
+        }
 
     }
 
