@@ -44,12 +44,19 @@ public class OpenbatonEventSubscription {
         this.logger = LoggerFactory.getLogger(this.getClass());
         this.requestor = new NFVORequestor(properties.getProperty("nfvo.username"), properties.getProperty("nfvo.password"), properties.getProperty("nfvo.baseURL"), properties.getProperty("nfvo.basePort"), "1");
 
-        EventEndpoint eventEndpoint = new EventEndpoint();
-        eventEndpoint.setType(EndpointType.RABBIT);
-        eventEndpoint.setEvent(Action.INSTANTIATE_FINISH);
-        eventEndpoint.setEndpoint(ConfigurationBeans.queueName_eventInstatiateFinish);
-        eventEndpoint.setName("eventNSRCreated");
-        requestor.getEventAgent().create(eventEndpoint);
+        EventEndpoint eventEndpointCreation = new EventEndpoint();
+        eventEndpointCreation.setType(EndpointType.RABBIT);
+        eventEndpointCreation.setEvent(Action.INSTANTIATE_FINISH);
+        eventEndpointCreation.setEndpoint(ConfigurationBeans.queueName_eventInstatiateFinish);
+        eventEndpointCreation.setName("eventNSRCreated");
+        requestor.getEventAgent().create(eventEndpointCreation);
+
+        EventEndpoint eventEndpointDeletion = new EventEndpoint();
+        eventEndpointDeletion.setType(EndpointType.RABBIT);
+        eventEndpointDeletion.setEvent(Action.RELEASE_RESOURCES_FINISH);
+        eventEndpointDeletion.setEndpoint(ConfigurationBeans.queueName_eventResourcesReleaseFinish);
+        eventEndpointDeletion.setName("eventNSRCreated");
+        requestor.getEventAgent().create(eventEndpointDeletion);
 
     }
 
@@ -77,19 +84,44 @@ public class OpenbatonEventSubscription {
                 if (!vlr.getQos().isEmpty()) {
                     for (String qosAttr : vlr.getQos()) {
                         if (qosAttr.contains("minimum_bandwith")) {
-                            if (evt.getAction().equals(Action.INSTANTIATE_FINISH)) {
-                                creator.addQos(nsr.getVnfr(), nsr.getId());
-                            } else if (evt.getAction().equals(Action.RELEASE_RESOURCES_FINISH)) {
-                                creator.removeQos(nsr.getVnfr(), nsr.getId());
-                            }
+                            creator.addQos(nsr.getVnfr(), nsr.getId());
                         }
-
                     }
                 }
             }
+        }
+    }
 
+    public void deleteNsr(String message){
+
+        logger.info("received new event " + message);
+        OpenbatonEvent evt;
+
+        try {
+            logger.debug("Trying to deserialize it");
+            evt = mapper.fromJson(message, OpenbatonEvent.class);
+        } catch (JsonParseException e) {
+            if (logger.isDebugEnabled() || logger.isTraceEnabled())
+                logger.warn("Error in payload, expected NSR ", e);
+            else
+                logger.warn("Error in payload, expected NSR " + e.getMessage());
+            return;
         }
 
 
+        NetworkServiceRecord nsr = evt.getPayload();
+
+        for (VirtualNetworkFunctionRecord vnfr : nsr.getVnfr()) {
+
+            for (VirtualLinkRecord vlr : vnfr.getConnected_external_virtual_link()) {
+                if (!vlr.getQos().isEmpty()) {
+                    for (String qosAttr : vlr.getQos()) {
+                        if (qosAttr.contains("minimum_bandwith")) {
+                            creator.removeQos(nsr.getVnfr(), nsr.getId());
+                        }
+                    }
+                }
+            }
+        }
     }
 }

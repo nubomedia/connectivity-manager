@@ -50,6 +50,10 @@ public class QoSCreator {
 
     }
 
+    public void removeQos(Set<VirtualNetworkFunctionRecord> vnfrs,String nsrId){
+
+    }
+
     private List<QoSAllocation> getQoses(Set<VirtualNetworkFunctionRecord> vnfrs) {
 
         Map<String, Quality> qualities = this.getVlrs(vnfrs);
@@ -90,11 +94,6 @@ public class QoSCreator {
                 return true;
         }
         return false;
-    }
-
-
-    public void removeQos(Set<VirtualNetworkFunctionRecord> vnfrs,String nsrId){
-
     }
 
     private FlowAllocation getSFlows(Set<VirtualNetworkFunctionRecord> vnfrs){

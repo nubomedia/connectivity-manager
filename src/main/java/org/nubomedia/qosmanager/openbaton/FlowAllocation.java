@@ -47,8 +47,16 @@ public class FlowAllocation {
 
     @Override
     public String toString() {
-        return "FlowAllocation{" +
-                "virtualLinkRecord=" + virtualLinkRecord +
-                '}';
+        String res = "";
+
+        for (String vlrid : virtualLinkRecord.keySet()){
+            res +=  vlrid + ": {\n";
+            for (FlowReference allocation : virtualLinkRecord.get(vlrid)){
+                res+="\tserver:" + allocation.getHostname() + "\n" + "ip:" + allocation.getIp() + "\n";
+            }
+
+        }
+
+        return res;
     }
 }

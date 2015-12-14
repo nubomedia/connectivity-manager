@@ -34,7 +34,7 @@ public class FlowHandler {
     }
 
     public void createFlows(Host host, List<Server> servers, FlowAllocation allocations){
-
+        logger.debug("Received Flow allocation " + allocations.toString());
         List<FlowServer> flows = new ArrayList<>();
         for (String vlr : allocations.getAllVlr()){
             for (FlowReference fr : allocations.getIpsForVlr(vlr)){
@@ -60,7 +60,8 @@ public class FlowHandler {
                 }
             }
         }
-        requestor.setFlow(new RequestFlows(flows));
+        RequestFlows returningFlows = requestor.setFlow(new RequestFlows(flows));
+        logger.debug("Returning flows " + returningFlows.toString());
     }
 
 }
