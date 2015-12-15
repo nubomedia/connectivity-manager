@@ -52,7 +52,7 @@ public class FlowHandler {
                             tmp.setPriority(priority);
                             tmp.setProtocol(protocol);
                             tmp.setSrc_ipv4(iface.getIp());
-
+                            tmp.setQueue_number("" + iface.getQos().getActualID());
                             internalFlows.add(tmp);
                         }
                         fs.setQos_flows(internalFlows);
