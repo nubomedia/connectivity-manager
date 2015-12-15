@@ -33,4 +33,12 @@ public class QoSAllocation {
     public void setIfaces(List<QoSReference> ifaces) {
         this.ifaces = ifaces;
     }
+
+    @Override
+    public String toString() {
+        return "QoSAllocation{" +
+                "serverName='" + serverName + '\'' +
+                ", ifaces=" + ifaces +
+                '}';
+    }
 }

@@ -38,8 +38,11 @@ public class QoSHandler {
         for(QoSAllocation allocation : queues){
 
             String serverName = allocation.getServerName();
+            logger.debug("[CREATING QUEUES] get server name " + serverName);
             String hypervisor = hostMap.belongsTo(serverName);
+            logger.debug("[CREATING QUEUES] get hypervisor name " + hypervisor);
             Server serverData = requestor.getServerData(hypervisor,serverName);
+            logger.debug("[CREATING QUEUES] server data is " + serverData.toString() );
             servers.add(serverData);
             ServerQoS serverQoS = this.compileServerRequest(serverData,allocation.getIfaces(),hypervisor);
             queuesReq.add(serverQoS);
@@ -69,6 +72,7 @@ public class QoSHandler {
 
     private ServerQoS compileServerRequest(Server serverData, List<QoSReference> ifaces, String hypervisor) {
 
+        logger.debug("[COMPILE SERVER REQUEST] Server data: " + serverData.toString() + " hypervisor " + hypervisor);
         ServerQoS res = new ServerQoS();
         res.setHypervisorId(hypervisor);
         res.setServerId(serverData.getId());

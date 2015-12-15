@@ -42,6 +42,10 @@ public class QosQueueValues {
         this.max_bitrate = max_bitrate;
     }
 
+//    public Quality getQuality (){
+//        Quality quality ;
+//    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -59,5 +63,13 @@ public class QosQueueValues {
         int result = getMin_bitrate().hashCode();
         result = 31 * result + getMax_bitrate().hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "QosQueueValues{" +
+                "min_bitrate='" + min_bitrate + '\'' +
+                ", max_bitrate='" + max_bitrate + '\'' +
+                '}';
     }
 }

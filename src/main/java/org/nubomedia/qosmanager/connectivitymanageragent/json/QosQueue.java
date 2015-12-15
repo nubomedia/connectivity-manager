@@ -47,5 +47,12 @@ public class QosQueue {
         this.id = id;
     }
 
-
+    @Override
+    public String toString() {
+        return "QosQueue{" +
+                "queue_uuid='" + queue_uuid + '\'' +
+                ", rates=" + rates +
+                ", id='" + id + '\'' +
+                '}';
+    }
 }

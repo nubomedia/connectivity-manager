@@ -8,6 +8,7 @@ import org.nubomedia.qosmanager.openbaton.QoSReference;
 import org.nubomedia.qosmanager.values.Quality;
 import org.openbaton.catalogue.mano.common.ConnectionPoint;
 import org.openbaton.catalogue.mano.common.Ip;
+import org.openbaton.catalogue.mano.descriptor.InternalVirtualLink;
 import org.openbaton.catalogue.mano.descriptor.VNFDConnectionPoint;
 import org.openbaton.catalogue.mano.descriptor.VirtualDeploymentUnit;
 import org.openbaton.catalogue.mano.record.VNFCInstance;
@@ -44,17 +45,15 @@ public class QoSCreator {
         logger.debug("adding qoses for " + qoses.toString());
 
         boolean response = handler.addQoS(qoses,flows,nsrId);
-
-
-
-
+        logger.debug("RESPONSE from Handler " + response);
     }
 
     public void removeQos(Set<VirtualNetworkFunctionRecord> vnfrs,String nsrId){
 
         List<String> servers = this.getServersWithQoS(vnfrs);
         logger.debug("remmoving qos for nsr " + nsrId + " with vnfrs: " + vnfrs);
-        boolean ressponse = handler.removeQoS(servers,nsrId);
+        boolean response = handler.removeQoS(servers,nsrId);
+        logger.debug("Response from handler " + response);
 
     }
 
@@ -99,9 +98,13 @@ public class QoSCreator {
                                         ref.setIp(ip.getIp());
                                     }
                                 }
+                                logger.debug("GET QOSES: adding reference to list " + ref.toString());
                                 ifaces.add(ref);
                             }
                         }
+                        logger.debug("IFACES " + ifaces);
+                        tmp.setIfaces(ifaces);
+                        logger.debug("QoSAllocation " + tmp);
                         res.add(tmp);
                     }
                 }
@@ -126,7 +129,6 @@ public class QoSCreator {
         FlowAllocation res = new FlowAllocation();
 
         for(String vlr : qualities.keySet()){
-
             List<FlowReference> references = this.findCprFromVirtualLink(vnfrs,vlr);
             res.addVirtualLink(vlr,references);
         }
@@ -146,7 +148,9 @@ public class QoSCreator {
                         if(cp.getVirtual_link_reference().equals(vlr)){
                             for(Ip ip : vnfc.getIps()){
                                 if(ip.getNetName().equals(cp.getVirtual_link_reference())){
-                                    res.add(new FlowReference(vnfc.getHostname(),ip.getIp()));
+                                    FlowReference tobeAdded = new FlowReference(vnfc.getHostname(),ip.getIp());
+                                    logger.debug("FIND CONNECTION POINT RECORD FROM VIRTUAL LINK: adding Flow Reference to list " + tobeAdded.toString());
+                                    res.add(tobeAdded);
                                 }
                             }
                         }
@@ -160,12 +164,14 @@ public class QoSCreator {
 
     private Map<String,Quality> getVlrs(Set<VirtualNetworkFunctionRecord> vnfrs) {
         Map<String,Quality> res = new LinkedHashMap<>();
+        logger.debug("GETTING VLRS");
         for (VirtualNetworkFunctionRecord vnfr : vnfrs){
-            for (VirtualLinkRecord vlr : vnfr.getConnected_external_virtual_link()){
+            for (InternalVirtualLink vlr : vnfr.getVirtual_link()){
                 for(String qosParam: vlr.getQos()) {
                     if (qosParam.contains("minimum_bandwith")){
                         Quality quality = this.mapValueQuality(qosParam);
                         res.put(vlr.getName(),quality);
+                        logger.debug("GET VIRTUAL LINK RECORD: insert in map vlr name " + vlr.getName() + " with quality " + quality);
                     }
                 }
             }
@@ -174,8 +180,9 @@ public class QoSCreator {
     }
 
     private Quality mapValueQuality(String value){
-
+        logger.debug("MAPPING VALUE-QUALITY: received value " + value);
         String[] qos = value.split(":");
+        logger.debug("MAPPING VALUE-QUALITY: quality is " + qos[1]);
         return Quality.valueOf(qos[1]);
     }
 

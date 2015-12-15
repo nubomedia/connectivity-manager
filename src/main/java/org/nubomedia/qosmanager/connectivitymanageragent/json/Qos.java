@@ -45,4 +45,12 @@ public class Qos {
     public void addQueue (QosQueue queue){
         this.queues.add(queue);
     }
+
+    @Override
+    public String toString() {
+        return "Qos{" +
+                "qos_uuid='" + qos_uuid + '\'' +
+                ", queues=" + queues +
+                '}';
+    }
 }

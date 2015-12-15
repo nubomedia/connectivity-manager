@@ -78,4 +78,13 @@ public class InterfaceQoS {
         result = 31 * result + getQos().hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "InterfaceQoS{" +
+                "ip='" + ip + '\'' +
+                ", ovs_port_number='" + ovs_port_number + '\'' +
+                ", qos=" + qos +
+                '}';
+    }
 }

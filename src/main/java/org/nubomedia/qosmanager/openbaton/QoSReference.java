@@ -33,4 +33,12 @@ public class QoSReference {
     public void setQuality(Quality quality) {
         this.quality = quality;
     }
+
+    @Override
+    public String toString() {
+        return "QoSReference{" +
+                "ip='" + ip + '\'' +
+                ", quality=" + quality +
+                '}';
+    }
 }

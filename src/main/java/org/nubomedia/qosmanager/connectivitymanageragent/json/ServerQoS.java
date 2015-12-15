@@ -64,4 +64,13 @@ public class ServerQoS {
         result = 31 * result + getInterfaces().hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "ServerQoS{" +
+                "hypervisorId='" + hypervisorId + '\'' +
+                ", serverId='" + serverId + '\'' +
+                ", interfaces=" + interfaces +
+                '}';
+    }
 }

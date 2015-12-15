@@ -28,7 +28,7 @@ public class Host {
 
         for (Datacenter datacenter : hypervisors){
 
-            if (datacenter.getServers().contains("serverName")){
+            if (datacenter.getServers().contains(serverName)){
 
                 return datacenter.getName();
 

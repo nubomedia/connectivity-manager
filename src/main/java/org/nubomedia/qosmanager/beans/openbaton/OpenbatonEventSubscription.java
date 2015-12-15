@@ -5,6 +5,7 @@ import com.google.gson.JsonParseException;
 import org.nubomedia.qosmanager.openbaton.OpenbatonEvent;
 import org.nubomedia.qosmanager.utils.ConfigReader;
 import org.nubomedia.qosmanager.utils.ConfigurationBeans;
+import org.openbaton.catalogue.mano.descriptor.InternalVirtualLink;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 import org.openbaton.catalogue.mano.record.VirtualLinkRecord;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
@@ -19,7 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -32,9 +36,10 @@ public class OpenbatonEventSubscription {
     private Logger logger;
     private Properties properties;
     @Autowired
-    QoSCreator creator;
+    private QoSCreator creator;
     @Autowired
     private Gson mapper;
+    private List<String> eventIds;
 
 
     @PostConstruct
@@ -43,6 +48,7 @@ public class OpenbatonEventSubscription {
         this.properties = ConfigReader.readProperties();
         this.logger = LoggerFactory.getLogger(this.getClass());
         this.requestor = new NFVORequestor(properties.getProperty("nfvo.username"), properties.getProperty("nfvo.password"), properties.getProperty("nfvo.baseURL"), properties.getProperty("nfvo.basePort"), "1");
+        this.eventIds = new ArrayList<>();
 
         EventEndpoint eventEndpointCreation = new EventEndpoint();
         eventEndpointCreation.setType(EndpointType.RABBIT);
@@ -57,6 +63,9 @@ public class OpenbatonEventSubscription {
         eventEndpointDeletion.setEndpoint(ConfigurationBeans.queueName_eventResourcesReleaseFinish);
         eventEndpointDeletion.setName("eventNSRCreated");
         requestor.getEventAgent().create(eventEndpointDeletion);
+
+        this.eventIds.add(eventEndpointCreation.getId());
+        this.eventIds.add(eventEndpointDeletion.getId());
 
     }
 
@@ -75,15 +84,20 @@ public class OpenbatonEventSubscription {
             return;
         }
 
-
+        logger.debug("Deserialized!!!");
+        logger.debug("ACTION: " + evt.getAction() + " PAYLOAD: " + evt.getPayload().toString());
         NetworkServiceRecord nsr = evt.getPayload();
+        logger.debug("NSR is " + nsr.toString());
 
         for (VirtualNetworkFunctionRecord vnfr : nsr.getVnfr()) {
-
-            for (VirtualLinkRecord vlr : vnfr.getConnected_external_virtual_link()) {
+            logger.debug("VNFR: " + vnfr.toString());
+            for (InternalVirtualLink vlr : vnfr.getVirtual_link()) {
+                logger.debug("VLR: " + vlr.toString());
                 if (!vlr.getQos().isEmpty()) {
                     for (String qosAttr : vlr.getQos()) {
+                        logger.debug("QoS Attribute: " + qosAttr);
                         if (qosAttr.contains("minimum_bandwith")) {
+                            logger.debug("FOUND QOS ATTR WITH QOS: " + qosAttr);
                             creator.addQos(nsr.getVnfr(), nsr.getId());
                         }
                     }
@@ -108,20 +122,30 @@ public class OpenbatonEventSubscription {
             return;
         }
 
-
+        logger.debug("Deserialized!!!");
+        logger.debug("ACTION: " + evt.getAction() + " PAYLOAD " + evt.getPayload().toString());
         NetworkServiceRecord nsr = evt.getPayload();
 
         for (VirtualNetworkFunctionRecord vnfr : nsr.getVnfr()) {
-
-            for (VirtualLinkRecord vlr : vnfr.getConnected_external_virtual_link()) {
+            logger.debug("VNFR: " + vnfr.toString());
+            for (InternalVirtualLink vlr : vnfr.getVirtual_link()) {
+                logger.debug("VLR: " + vlr.toString());
                 if (!vlr.getQos().isEmpty()) {
                     for (String qosAttr : vlr.getQos()) {
                         if (qosAttr.contains("minimum_bandwith")) {
+                            logger.debug("FOUND QOS ATTR WITH QOS: " + qosAttr);
                             creator.removeQos(nsr.getVnfr(), nsr.getId());
                         }
                     }
                 }
             }
+        }
+    }
+
+    @PreDestroy
+    private void dispose() throws SDKException {
+        for (String id : this.eventIds) {
+            requestor.getEventAgent().delete(id);
         }
     }
 }

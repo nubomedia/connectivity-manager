@@ -51,6 +51,7 @@ public class ConnectivityManagerRequestor {
 
     public QosAdd setQoS(QosAdd qosRequest){
 
+        logger.debug("SENDING REQUEST FOR " + mapper.toJson(qosRequest,QosAdd.class));
         String url = cmProp.getProperty("cmUrl") + "/qoses";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -63,12 +64,15 @@ public class ConnectivityManagerRequestor {
             return null;
         }
         else {
-            return mapper.fromJson(insert.getBody(),QosAdd.class);
+            QosAdd result = mapper.fromJson(insert.getBody(),QosAdd.class);
+            logger.debug("RESULT IS " + insert.getStatusCode() + " with body " + mapper.toJson(result,QosAdd.class));
+            return result;
         }
     }
 
     public Server getServerData(String hypervisorName, String serverName){
 
+        logger.debug("Getting data for server " + serverName + " that belong to " + hypervisorName);
         String url = cmProp.getProperty("cmUrl") + "/server/" + hypervisorName + "/" + serverName;
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> getEntity = new HttpEntity<>(headers);
@@ -80,7 +84,9 @@ public class ConnectivityManagerRequestor {
             return null;
         }
         else{
-            return mapper.fromJson(server.getBody(),Server.class);
+            Server result = mapper.fromJson(server.getBody(),Server.class);
+            logger.debug("Request produced " + server.getStatusCode() + " with data " + mapper.toJson(result,Server.class));
+            return result;
         }
     }
 
