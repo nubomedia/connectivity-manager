@@ -41,6 +41,7 @@ public class ConnectivityManagerHandler {
         this.updateHost();
         List<Server> servers = queueHandler.createQueues(hostMap, queues);
         internalData.put(nsrId,servers);
+        logger.debug("MAP VALUE IS " + nsrId + " -> " + servers.toString());
 
         flowsHandler.createFlows(hostMap,servers,flows);
 
@@ -53,7 +54,9 @@ public class ConnectivityManagerHandler {
 
     public boolean removeQoS(List<String> servers,String nsrID){
 
-        queueHandler.removeQos(hostMap,internalData.get(nsrID),servers);
+        List<Server> serversList = internalData.get(nsrID);
+        logger.debug("SERVER LIST FOR DELETING IS " + serversList.toString());
+        queueHandler.removeQos(hostMap,serversList,servers);
         flowsHandler.removeFlows(hostMap,servers,internalData.get(nsrID));
         internalData.remove(nsrID);
         return true;

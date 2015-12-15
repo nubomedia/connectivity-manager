@@ -23,4 +23,11 @@ public class RequestFlows {
     public void setFlows(List<FlowServer> flows) {
         this.flows = flows;
     }
+
+    @Override
+    public String toString() {
+        return "RequestFlows{" +
+                "flows=" + flows +
+                '}';
+    }
 }

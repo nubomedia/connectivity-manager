@@ -71,4 +71,16 @@ public class Flow {
     public void setQueue_number(String queue_number) {
         this.queue_number = queue_number;
     }
+
+    @Override
+    public String toString() {
+        return "Flow{" +
+                "ovs_port='" + ovs_port + '\'' +
+                ", src_ipv4='" + src_ipv4 + '\'' +
+                ", dest_ipv4='" + dest_ipv4 + '\'' +
+                ", protocol='" + protocol + '\'' +
+                ", priority='" + priority + '\'' +
+                ", queue_number='" + queue_number + '\'' +
+                '}';
+    }
 }

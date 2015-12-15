@@ -42,4 +42,13 @@ public class FlowServer {
     public void setQos_flows(List<Flow> qos_flows) {
         this.qos_flows = qos_flows;
     }
+
+    @Override
+    public String toString() {
+        return "FlowServer{" +
+                "hypervisor_id='" + hypervisor_id + '\'' +
+                ", server_id='" + server_id + '\'' +
+                ", qos_flows=" + qos_flows +
+                '}';
+    }
 }

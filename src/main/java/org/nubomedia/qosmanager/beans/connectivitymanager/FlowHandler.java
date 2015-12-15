@@ -61,7 +61,9 @@ public class FlowHandler {
                 }
             }
         }
-        RequestFlows returningFlows = requestor.setFlow(new RequestFlows(flows));
+        RequestFlows request = new RequestFlows(flows);
+        logger.debug("REQUEST is " + request.toString());
+        RequestFlows returningFlows = requestor.setFlow(request);
         logger.debug("Returning flows " + returningFlows.toString());
     }
 
