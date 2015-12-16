@@ -55,14 +55,14 @@ public class OpenbatonEventSubscription {
         eventEndpointCreation.setEvent(Action.INSTANTIATE_FINISH);
         eventEndpointCreation.setEndpoint(ConfigurationBeans.queueName_eventInstatiateFinish);
         eventEndpointCreation.setName("eventNSRCreated");
-        requestor.getEventAgent().create(eventEndpointCreation);
+        eventEndpointCreation = requestor.getEventAgent().create(eventEndpointCreation);
 
         EventEndpoint eventEndpointDeletion = new EventEndpoint();
         eventEndpointDeletion.setType(EndpointType.RABBIT);
         eventEndpointDeletion.setEvent(Action.RELEASE_RESOURCES_FINISH);
         eventEndpointDeletion.setEndpoint(ConfigurationBeans.queueName_eventResourcesReleaseFinish);
         eventEndpointDeletion.setName("eventNSRCreated");
-        requestor.getEventAgent().create(eventEndpointDeletion);
+        eventEndpointDeletion = requestor.getEventAgent().create(eventEndpointDeletion);
 
         this.eventIds.add(eventEndpointCreation.getId());
         this.eventIds.add(eventEndpointDeletion.getId());

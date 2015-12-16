@@ -108,11 +108,6 @@ public class QoSHandler {
                 String hypervisor = hostMap.belongsTo(server.getName());
                 for (InterfaceQoS iface : server.getInterfaces()){
                     Qos ifaceQoS = iface.getQos();
-                    if (!ifaceQoS.getQueues().isEmpty()){
-                        for(QosQueue queue : ifaceQoS.getQueues()){
-                            requestor.delQueue(hypervisor,ifaceQoS.getQos_uuid(),queue.getUuid(),queue.getId());
-                        }
-                    }
                     requestor.delQos(hypervisor,ifaceQoS.getQos_uuid());
                 }
             }
