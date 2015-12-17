@@ -97,6 +97,11 @@ public class ConnectivityManagerRequestor {
         HttpEntity<String> delentity = new HttpEntity<>(headers);
         ResponseEntity<String> delete = template.exchange(url,HttpMethod.DELETE,delentity,String.class);
 
+        if(delete.getStatusCode().is5xxServerError()){
+            logger.debug("The port is still here, returned " + delete.getStatusCode() + " with body " + delete.getBody());
+            return delete.getStatusCode();
+        }
+
         logger.debug("deleting qos " + qosId + " has returned " + delete.getStatusCode());
 
         return delete.getStatusCode();

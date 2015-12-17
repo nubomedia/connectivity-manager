@@ -1,18 +1,16 @@
 package org.nubomedia.qosmanager.beans.openbaton;
 
 import org.nubomedia.qosmanager.beans.connectivitymanager.ConnectivityManagerHandler;
-import org.nubomedia.qosmanager.openbaton.FlowReference;
 import org.nubomedia.qosmanager.openbaton.FlowAllocation;
+import org.nubomedia.qosmanager.openbaton.FlowReference;
 import org.nubomedia.qosmanager.openbaton.QoSAllocation;
 import org.nubomedia.qosmanager.openbaton.QoSReference;
 import org.nubomedia.qosmanager.values.Quality;
-import org.openbaton.catalogue.mano.common.ConnectionPoint;
 import org.openbaton.catalogue.mano.common.Ip;
 import org.openbaton.catalogue.mano.descriptor.InternalVirtualLink;
 import org.openbaton.catalogue.mano.descriptor.VNFDConnectionPoint;
 import org.openbaton.catalogue.mano.descriptor.VirtualDeploymentUnit;
 import org.openbaton.catalogue.mano.record.VNFCInstance;
-import org.openbaton.catalogue.mano.record.VirtualLinkRecord;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +65,7 @@ public class QoSCreator {
                 for (VNFCInstance vnfcInstance : vdu.getVnfc_instance()){
                     for (VNFDConnectionPoint connectionPoint : vnfcInstance.getConnection_point()){
                         if (qualities.keySet().contains(connectionPoint.getVirtual_link_reference())){
+                            logger.debug("GETSERVERWITHQOS");
                             res.add(vnfcInstance.getHostname());
                         }
                     }

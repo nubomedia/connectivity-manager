@@ -94,7 +94,8 @@ public class QoSHandler {
     private InterfaceQoS addQuality(InterfaceQoS serverIface, Quality quality) {
 
         Qos qos = serverIface.getQos();
-        String id = "" + qos.getActualID()+1;
+        int idNum = qos.getActualID()+1;
+        String id = "" + idNum;
         QosQueue queue = new QosQueue(new QosQueueValues(quality),"",id);
         qos.addQueue(queue);
         serverIface.setQos(qos);

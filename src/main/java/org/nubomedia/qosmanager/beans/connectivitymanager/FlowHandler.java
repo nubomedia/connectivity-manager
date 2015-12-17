@@ -23,15 +23,13 @@ public class FlowHandler {
     private Logger logger;
     private String protocol;
     private String priority;
-    private String dest_port;
 
     @PostConstruct
     private void init(){
 
         this.logger = LoggerFactory.getLogger(this.getClass());
         this.protocol = "tcp";
-        this.priority = "1";
-        this.dest_port = "8888";
+        this.priority = "2";
 
     }
 
@@ -48,15 +46,17 @@ public class FlowHandler {
                         InterfaceQoS iface = server.getFromIp(fr.getIp());
                         List<Flow> internalFlows = new ArrayList<>();
                         for(String ip : allocations.getAllIpsForVlr(vlr)){
-                            Flow tmp = new Flow();
-                            tmp.setDest_ipv4(ip);
-                            tmp.setOvs_port_number(iface.getOvs_port_number());
-                            tmp.setPriority(priority);
-                            tmp.setProtocol(protocol);
-                            tmp.setSrc_ipv4(iface.getIp());
-                            tmp.setDest_port(dest_port);
-                            tmp.setQueue_number("" + iface.getQos().getActualID()+1);
-                            internalFlows.add(tmp);
+                            if (!ip.equals(fr.getIp())) {
+                                Flow tmp = new Flow();
+                                tmp.setDest_ipv4(ip);
+                                tmp.setOvs_port_number(iface.getOvs_port_number());
+                                tmp.setPriority(priority);
+                                tmp.setProtocol(protocol);
+                                tmp.setSrc_ipv4(iface.getIp());
+                                int id = iface.getQos().getActualID();
+                                tmp.setQueue_number("" + id);
+                                internalFlows.add(tmp);
+                            }
                         }
                         fs.setQos_flows(internalFlows);
                         flows.add(fs);

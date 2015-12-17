@@ -54,8 +54,17 @@ public class ConnectivityManagerHandler {
 
     public boolean removeQoS(List<String> servers,String nsrID){
 
-        List<Server> serversList = internalData.get(nsrID);
-        logger.debug("SERVER LIST FOR DELETING IS " + serversList.toString());
+        List<Server> serversList;
+
+        try {
+            serversList = internalData.get(nsrID);
+            logger.info("SERVER LIST FOR DELETING IS " + serversList.toString());
+        }
+        catch (NullPointerException e){
+            logger.debug("Servers for " + nsrID + " not found");
+            return false;
+        }
+
         queueHandler.removeQos(hostMap,serversList,servers);
         flowsHandler.removeFlows(hostMap,servers,internalData.get(nsrID));
         internalData.remove(nsrID);

@@ -89,6 +89,7 @@ public class OpenbatonEventSubscription {
         NetworkServiceRecord nsr = evt.getPayload();
         logger.debug("NSR is " + nsr.toString());
 
+        vnfrloop:
         for (VirtualNetworkFunctionRecord vnfr : nsr.getVnfr()) {
             logger.debug("VNFR: " + vnfr.toString());
             for (InternalVirtualLink vlr : vnfr.getVirtual_link()) {
@@ -99,6 +100,7 @@ public class OpenbatonEventSubscription {
                         if (qosAttr.contains("minimum_bandwith")) {
                             logger.debug("FOUND QOS ATTR WITH QOS: " + qosAttr);
                             creator.addQos(nsr.getVnfr(), nsr.getId());
+                            break vnfrloop;
                         }
                     }
                 }
@@ -126,6 +128,7 @@ public class OpenbatonEventSubscription {
         logger.debug("ACTION: " + evt.getAction() + " PAYLOAD " + evt.getPayload().toString());
         NetworkServiceRecord nsr = evt.getPayload();
 
+        vnfrloop:
         for (VirtualNetworkFunctionRecord vnfr : nsr.getVnfr()) {
             logger.debug("VNFR: " + vnfr.toString());
             for (InternalVirtualLink vlr : vnfr.getVirtual_link()) {
@@ -135,6 +138,7 @@ public class OpenbatonEventSubscription {
                         if (qosAttr.contains("minimum_bandwith")) {
                             logger.debug("FOUND QOS ATTR WITH QOS: " + qosAttr);
                             creator.removeQos(nsr.getVnfr(), nsr.getId());
+                            break vnfrloop;
                         }
                     }
                 }

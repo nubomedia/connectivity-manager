@@ -8,16 +8,14 @@ public class Flow {
     private String ovs_port_number;
     private String src_ipv4;
     private String dest_ipv4;
-    private String dest_port;
     private String protocol; //could be tcp/udp
     private String priority;
     private String queue_number;
 
-    public Flow(String ovs_port_number, String src_ipv4, String dest_ipv4, String dest_port, String protocol, String priority, String queue_number) {
+    public Flow(String ovs_port_number, String src_ipv4, String dest_ipv4, String protocol, String priority, String queue_number) {
         this.ovs_port_number = ovs_port_number;
         this.src_ipv4 = src_ipv4;
         this.dest_ipv4 = dest_ipv4;
-        this.dest_port = dest_port;
         this.protocol = protocol;
         this.priority = priority;
         this.queue_number = queue_number;
@@ -72,14 +70,6 @@ public class Flow {
 
     public void setQueue_number(String queue_number) {
         this.queue_number = queue_number;
-    }
-
-    public String getDest_port() {
-        return dest_port;
-    }
-
-    public void setDest_port(String dest_port) {
-        this.dest_port = dest_port;
     }
 
     @Override
