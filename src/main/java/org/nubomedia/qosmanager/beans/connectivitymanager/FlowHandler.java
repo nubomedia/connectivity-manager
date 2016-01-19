@@ -38,7 +38,7 @@ public class FlowHandler {
         List<FlowServer> flows = new ArrayList<>();
         for (String vlr : allocations.getAllVlr()){
             for (FlowReference fr : allocations.getIpsForVlr(vlr)){
-                for(Server server: servers){
+                for(Server server : servers){
                     if(server.getName().equals(fr.getHostname())){
                         FlowServer fs = new FlowServer();
                         fs.setHypervisor_id(host.belongsTo(server.getName()));
@@ -49,12 +49,12 @@ public class FlowHandler {
                             if (!ip.equals(fr.getIp())) {
                                 Flow tmp = new Flow();
                                 tmp.setDest_ipv4(ip);
-                                tmp.setOvs_port_number(iface.getOvs_port_number());
+                                Server dest = this.getServerRefFromIp(servers,ip);
+                                tmp.setOvs_port_number(dest.getFromIp(ip).getOvs_port_number());
                                 tmp.setPriority(priority);
                                 tmp.setProtocol(protocol);
                                 tmp.setSrc_ipv4(iface.getIp());
-                                int id = iface.getQos().getActualID();
-                                tmp.setQueue_number("" + id);
+                                tmp.setQueue_number("" + dest.getFromIp(ip).getQos().getActualID());
                                 internalFlows.add(tmp);
                             }
                         }
@@ -80,6 +80,18 @@ public class FlowHandler {
                 }
             }
         }
+    }
+
+    private Server getServerRefFromIp (List<Server> servers, String ip){
+
+
+        for (Server server : servers){
+            if(server.getFromIp(ip) != null){
+                return server;
+            }
+        }
+
+        return null;
     }
 
 }

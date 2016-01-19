@@ -14,27 +14,29 @@ import org.openbaton.catalogue.mano.record.VNFCInstance;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
- * Created by maa on 02.12.15.
+ * Created by maa on 18.01.16.
  */
-@Service
-public class QoSCreator {
+public class AddQoSExecutor implements Runnable{
 
-    @Autowired private ConnectivityManagerHandler handler;
+    private ConnectivityManagerHandler connectivityManagerHandler;
     private Logger logger;
+    private Set<VirtualNetworkFunctionRecord> vnfrs;
+    private String nsrID;
 
-    @PostConstruct
-    private void init(){
+    public AddQoSExecutor(ConnectivityManagerHandler connectivityManagerHandler, Set<VirtualNetworkFunctionRecord> vnfrs, String nsrID) {
+        this.connectivityManagerHandler = connectivityManagerHandler;
+        this.vnfrs = vnfrs;
+        this.nsrID = nsrID;
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
-    public void addQos(Set<VirtualNetworkFunctionRecord> vnfrs,String nsrId){
+    @Override
+    public void run() {
+
         logger.debug("Received vnfrs with qos");
 
         FlowAllocation flows = this.getSFlows(vnfrs);
@@ -42,38 +44,9 @@ public class QoSCreator {
         List<QoSAllocation> qoses = this.getQoses(vnfrs);
         logger.debug("adding qoses for " + qoses.toString());
 
-        boolean response = handler.addQoS(qoses,flows,nsrId);
+        boolean response = connectivityManagerHandler.addQoS(qoses,flows,nsrID);
         logger.debug("RESPONSE from Handler " + response);
-    }
 
-    public void removeQos(Set<VirtualNetworkFunctionRecord> vnfrs,String nsrId){
-
-        List<String> servers = this.getServersWithQoS(vnfrs);
-        logger.debug("remmoving qos for nsr " + nsrId + " with vnfrs: " + vnfrs);
-        boolean response = handler.removeQoS(servers,nsrId);
-        logger.debug("Response from handler " + response);
-
-    }
-
-    private  List<String> getServersWithQoS(Set<VirtualNetworkFunctionRecord> vnfrs){
-        List<String> res = new ArrayList<>();
-
-        Map<String, Quality> qualities = this.getVlrs(vnfrs);
-
-        for (VirtualNetworkFunctionRecord vnfr : vnfrs){
-            for (VirtualDeploymentUnit vdu : vnfr.getVdu()){
-                for (VNFCInstance vnfcInstance : vdu.getVnfc_instance()){
-                    for (VNFDConnectionPoint connectionPoint : vnfcInstance.getConnection_point()){
-                        if (qualities.keySet().contains(connectionPoint.getVirtual_link_reference())){
-                            logger.debug("GETSERVERWITHQOS");
-                            res.add(vnfcInstance.getHostname());
-                        }
-                    }
-                }
-            }
-        }
-
-        return res;
     }
 
     private List<QoSAllocation> getQoses(Set<VirtualNetworkFunctionRecord> vnfrs) {
@@ -136,6 +109,23 @@ public class QoSCreator {
 
     }
 
+    private Map<String,Quality> getVlrs(Set<VirtualNetworkFunctionRecord> vnfrs) {
+        Map<String,Quality> res = new LinkedHashMap<>();
+        logger.debug("GETTING VLRS");
+        for (VirtualNetworkFunctionRecord vnfr : vnfrs){
+            for (InternalVirtualLink vlr : vnfr.getVirtual_link()){
+                for(String qosParam: vlr.getQos()) {
+                    if (qosParam.contains("minimum_bandwith")){
+                        Quality quality = this.mapValueQuality(qosParam);
+                        res.put(vlr.getName(),quality);
+                        logger.debug("GET VIRTUAL LINK RECORD: insert in map vlr name " + vlr.getName() + " with quality " + quality);
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
     private List<FlowReference> findCprFromVirtualLink(Set<VirtualNetworkFunctionRecord> vnfrs, String vlr){
 
         List<FlowReference> res = new ArrayList<>();
@@ -161,30 +151,10 @@ public class QoSCreator {
         return res;
     }
 
-    private Map<String,Quality> getVlrs(Set<VirtualNetworkFunctionRecord> vnfrs) {
-        Map<String,Quality> res = new LinkedHashMap<>();
-        logger.debug("GETTING VLRS");
-        for (VirtualNetworkFunctionRecord vnfr : vnfrs){
-            for (InternalVirtualLink vlr : vnfr.getVirtual_link()){
-                for(String qosParam: vlr.getQos()) {
-                    if (qosParam.contains("minimum_bandwith")){
-                        Quality quality = this.mapValueQuality(qosParam);
-                        res.put(vlr.getName(),quality);
-                        logger.debug("GET VIRTUAL LINK RECORD: insert in map vlr name " + vlr.getName() + " with quality " + quality);
-                    }
-                }
-            }
-        }
-        return res;
-    }
-
     private Quality mapValueQuality(String value){
         logger.debug("MAPPING VALUE-QUALITY: received value " + value);
         String[] qos = value.split(":");
         logger.debug("MAPPING VALUE-QUALITY: quality is " + qos[1]);
         return Quality.valueOf(qos[1]);
     }
-
-
-
 }

@@ -7,7 +7,6 @@ import org.nubomedia.qosmanager.utils.ConfigReader;
 import org.nubomedia.qosmanager.utils.ConfigurationBeans;
 import org.openbaton.catalogue.mano.descriptor.InternalVirtualLink;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
-import org.openbaton.catalogue.mano.record.VirtualLinkRecord;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.openbaton.catalogue.nfvo.Action;
 import org.openbaton.catalogue.nfvo.EndpointType;
@@ -36,7 +35,7 @@ public class OpenbatonEventSubscription {
     private Logger logger;
     private Properties properties;
     @Autowired
-    private QoSCreator creator;
+    private QoSAllocator creator;
     @Autowired
     private Gson mapper;
     private List<String> eventIds;
@@ -47,7 +46,7 @@ public class OpenbatonEventSubscription {
 
         this.properties = ConfigReader.readProperties();
         this.logger = LoggerFactory.getLogger(this.getClass());
-        this.requestor = new NFVORequestor(properties.getProperty("nfvo.username"), properties.getProperty("nfvo.password"), properties.getProperty("nfvo.baseURL"), properties.getProperty("nfvo.basePort"), "1");
+        this.requestor = new NFVORequestor("", "", properties.getProperty("nfvo.baseURL"), properties.getProperty("nfvo.basePort"), "1");
         this.eventIds = new ArrayList<>();
 
         EventEndpoint eventEndpointCreation = new EventEndpoint();
