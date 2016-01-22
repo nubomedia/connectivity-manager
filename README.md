@@ -18,7 +18,7 @@ Both options are described below.
 
 ### Automatic installation and start
 
-The [bootstrap] repository contains the script to install and start the Nubomedia PaaS Manager automatically.
+The [bootstrap] repository contains the script to install and start the Connectivity Manager automatically.
 In order to do it you can run the following command:
 
 ```bash
@@ -30,7 +30,7 @@ Check if the NFVO and/or the MS-VNFM is not installed and started otherwise the 
 
 In case the Connectivity-Manager are already installed you can start them manually using the provided script as described [here](#start-the-connectivity-manager-manually)
 
-### Install the Connecitivity Manager manually
+### Install the Connectivity Manager manually
 
 1. Download the source code from git:
 
@@ -66,7 +66,7 @@ The Connectivity Manager can be started by executing the following command (in t
 ./connectivity-manager.sh start
 ```
 
-Once the Nubomedia PaaS Manager is started you can access the screen session that is in another window with the ms-vnfm running:
+Once the Connectivity Manager is started you can access the screen session that is in another window with the ms-vnfm running:
 
 ```bash
 screen -x connectivity-manager
