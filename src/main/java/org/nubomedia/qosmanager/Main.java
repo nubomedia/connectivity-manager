@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class Main {
 
     public static void main(String[] args){
-        SpringApplication.run(Main.class);
+        SpringApplication.run(Main.class, args);
     }
 
 }

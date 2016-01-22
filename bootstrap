@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+set -e
+#
+# This script allows you to install Nubomedia PaaS API. To execute it:
+#
+# 'curl -fsSkL https://raw.githubusercontent.com/fhg-fokus-nubomedia/bootstrap/master/bootstrap | bash'
+
+
+export DEBIAN_FRONTEND=noninteractive
+_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+_connectivity_manager_base_repo="https://github.com/tub-nubomedia/connectivity-manager.git"
+_tag="develop"
+#_tag="tags/1.1"
+
+
+_base=/opt
+_connectivity_manager_base="${_base}/nubomedia"
+_connectivty_manager="${_connectivty_manager_base}/connectivty-manager"
+_log_folder=/var/log/nubomedia
+
+_user="$(id -un 2>/dev/null || true)"
+
+function checkBinary {
+  echo -n " * Checking for '$1'..."
+  if command -v $1 >/dev/null 2>&1; then
+     echo "OK"
+     return 0
+   else
+     echo >&2 "FAILED."
+     return 1
+   fi
+}
+
+_ex='sh -c'
+if [ "$_user" != 'root' ]; then
+    if checkBinary sudo; then
+        _ex='sudo -E sh -c'
+    elif checkBinary su; then
+        _ex='su -c'
+    fi
+fi
+
+function createConnectivtyManagerBase {
+    echo "Creating the Connectivity Manager base folder"
+    # removing it if exists
+    #$_ex 'rm -rf '$__connectivity_manager_base
+    $_ex 'mkdir -p '$_connectivty_manager
+    $_ex 'chown -R '"$_user $_connectivity_manager_base"
+
+    # create log folder and give permission
+    #$_ex 'rm -rf '$_log_folder
+    $_ex 'mkdir -p '$_log_folder
+    $_ex 'chown -R '"$_user $_log_folder"
+}
+
+function compileProperties {
+
+    export baseUrl
+    read -p "Enter the PaaS ip [https://localhost:8091]: " baseUrl
+    if [[ "$baseUrl" != "" ]]; then
+        $_ex 'sed -i "s|cmUrl=http://localhost:8091|cmUrl=$baseUrl|g" /etc/nubomedia/qos.properties'
+    fi
+
+    export nfvoIp
+    read -p "Enter the Orchestrator ip [localhost]: " nfvoIp
+    if [[ $nfvoIp != "" ]]; then
+         $_ex 'sed -i "s/nfvo.baseURL=localhost/nfvo.baseURL=$nfvoIp/g" /etc/nubomedia/qos.properties'
+    fi
+
+    export nfvoUsername
+    read -p "Enter the Orchestrator username [admin]: " nfvoUsername
+    if [[ $nfvoUsername != "" ]]; then
+         $_ex 'sed -i "s/nfvo.username=admin/nfvo.username=$nfvoUsername/g" /etc/nubomedia/qos.properties'
+    fi
+
+    export nfvoPassword
+    read -p "Enter the Orchestrator password [openbaton]: " nfvoPassword
+    if [[ $nfvoPassword != "" ]]; then
+         $_ex 'sed -i "s/nfvo.password=openbaton/nfvo.password=$nfvoPassword/g" /etc/nubomedia/qos.properties'
+    fi
+
+}
+
+function checkoutConnectivityManager {
+    echo "Getting the Connectivity Manager..."
+    createConnectivtyManagerBase
+    git clone --recursive "${_connectivity_manager_base_repo}" "${_connectivty_manager}"
+    pushd "${_connectivty_manager}"
+    git checkout ${_tag}
+    popd
+    echo "created properties folder"
+    $_ex 'cp '"${_connectivty_manager}/src/main/resources/qos.properties /etc/nubomedia/qos.properties"
+    echo "copied properties file, now modifing..."
+}
+
+function compileConnectivityManager {
+    echo "compiling the Nubomedia PaaS API"
+    pushd "${_connectivty_manager}"
+    ./connectivty-manager.sh compile
+    if [ $? -ne 0 ]; then
+        echo "ERROR: The compilation of the Connectivity Manager failed"
+        exit 1
+    fi
+    popd
+}
+
+function startNubomediaPaaS {
+    echo "starting the Nubomedia PaaS API"
+    pushd ${_connectivty_manager}
+    ./connectivty-manager.sh start
+    popd
+}
+
+function deployConnectivityManager {
+    compileConnectivityManager
+    startNubomediaPaaS
+}
+
+function bootstrap {
+    # checkout Nubomedia PaaS API
+    checkoutConnectivityManager
+    compileProperties
+    # deploy and compile Nubomedia PaaS API
+    deployConnectivityManager
+    echo "Connectivity is up and running now. Check screen -x connectivity-manager..."
+
+}
+
+bootstrap
