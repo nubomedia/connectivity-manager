@@ -84,7 +84,7 @@ function compileProperties {
 
 function checkoutConnectivityManager {
     echo "Getting the Connectivity Manager..."
-    createConnectivtyManagerBase
+    createConnectivityManagerBase
     git clone --recursive "${_connectivity_manager_base_repo}" "${_connectivty_manager}"
     pushd "${_connectivty_manager}"
     git checkout ${_tag}
