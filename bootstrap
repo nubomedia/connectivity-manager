@@ -95,7 +95,7 @@ function checkoutConnectivityManager {
 }
 
 function compileConnectivityManager {
-    echo "compiling the Nubomedia PaaS API"
+    echo "compiling the Connectivity Manager"
     pushd "${_connectivity_manager}"
     ./connectivity-manager.sh compile
     if [ $? -ne 0 ]; then
@@ -106,7 +106,7 @@ function compileConnectivityManager {
 }
 
 function startConnectivityManager {
-    echo "starting the Nubomedia PaaS API"
+    echo "starting the Connectivity Manager"
     pushd ${_connectivity_manager}
     ./connectivity-manager.sh start
     popd
@@ -118,10 +118,10 @@ function deployConnectivityManager {
 }
 
 function bootstrap {
-    # checkout Nubomedia PaaS API
+    # checkout Connectivity Manager
     checkoutConnectivityManager
     compileProperties
-    # deploy and compile Nubomedia PaaS API
+    # deploy and compile Connectivity Manager
     deployConnectivityManager
     echo "Connectivity is up and running now. Check screen -x connectivity-manager..."
 
