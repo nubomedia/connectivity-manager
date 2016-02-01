@@ -59,7 +59,7 @@ function compileProperties {
     export baseUrl
     read -p "Enter the PaaS ip [https://localhost:8091]: " baseUrl
     if [[ "$baseUrl" != "" ]]; then
-        $_ex 'sed -i "s|cmUrl=http://localhost:8091|cmUrl=$baseUrl|g" /etc/nubomedia/qos.properties'
+        $_ex 'sed -i "s|connectivitymanager.baseUrl=http://localhost:8091|connectivitymanager.baseUrl=$baseUrl|g" /etc/nubomedia/qos.properties'
     fi
 
     export nfvoIp
