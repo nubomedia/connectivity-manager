@@ -45,7 +45,7 @@ function createConnectivityManagerBase {
     echo "Creating the Connectivity Manager base folder"
     # removing it if exists
     #$_ex 'rm -rf '$__connectivity_manager_base
-    $_ex 'mkdir -p '$_connectivty_manager'
+    $_ex 'mkdir -p '$_connectivty_manager
     $_ex 'chown -R '"$_user $_connectivity_manager_base"
 
     # create log folder and give permission
