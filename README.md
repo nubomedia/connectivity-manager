@@ -85,45 +85,20 @@ Here you can configure:
 
 After changing any configuration, you need to restart
 
+## LICENSE
+
+See [LICENSE][LICENSE]
+
+#### Development
+
+Do you want to contribute? Great! [Write us](mailto:nubomedia@av.tu-berlin.de)!.
+
+
 [orchestrator]:http://openbaton.github.io
 [vnfm]:https://github.com/tub-nubomedia/ms-vnfm
 [spring.io]:https://spring.io/
 [cma]:https://github.com/tub-nubomedia/connectivity-manager-agent.git
 [bootstrap]:https://raw.githubusercontent.com/tub-nubomedia/connectivity-manager/develop/bootstrap
 [NFV MANO]:http://www.etsi.org/deliver/etsi_gs/NFV-MAN/001_099/001/01.01.01_60/gs_nfv-man001v010101p.pdf
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 [nubomedia]:https://www.nubomedia.eu
+[LICENSE]:./LICENSE
