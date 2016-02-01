@@ -13,23 +13,25 @@
  *  limitations under the License.
  */
 
-package org.nubomedia.qosmanager;
+package org.nubomedia.qosmanager.configurations;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Service;
 
 /**
- * Created by maa on 02.12.15.
+ * Created by maa on 01.02.16.
  */
-@SpringBootApplication
-@EnableScheduling
-@EnableConfigurationProperties
-public class Main {
+@Service
+@ConfigurationProperties(prefix = "connectivitymanager")
+public class ConnectivityManagerConfiguration {
 
-    public static void main(String[] args){
-        SpringApplication.run(Main.class, args);
+    private String baseUrl;
+
+    public String getBaseUrl() {
+        return baseUrl;
     }
 
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
 }

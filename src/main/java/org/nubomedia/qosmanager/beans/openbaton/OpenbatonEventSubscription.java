@@ -17,6 +17,7 @@ package org.nubomedia.qosmanager.beans.openbaton;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import org.nubomedia.qosmanager.configurations.NfvoConfiguration;
 import org.nubomedia.qosmanager.openbaton.OpenbatonEvent;
 import org.nubomedia.qosmanager.utils.ConfigReader;
 import org.nubomedia.qosmanager.utils.ConfigurationBeans;
@@ -48,7 +49,7 @@ public class OpenbatonEventSubscription {
 
     private NFVORequestor requestor;
     private Logger logger;
-    private Properties properties;
+    @Autowired private NfvoConfiguration configuration;
     @Autowired
     private QoSAllocator creator;
     @Autowired
@@ -59,9 +60,8 @@ public class OpenbatonEventSubscription {
     @PostConstruct
     private void init() throws SDKException, IOException {
 
-        this.properties = ConfigReader.readProperties();
         this.logger = LoggerFactory.getLogger(this.getClass());
-        this.requestor = new NFVORequestor("", "", properties.getProperty("nfvo.baseURL"), properties.getProperty("nfvo.basePort"), "1");
+        this.requestor = new NFVORequestor("", "", configuration.getBaseURL(), configuration.getBasePort(), "1");
         this.eventIds = new ArrayList<>();
 
         EventEndpoint eventEndpointCreation = new EventEndpoint();

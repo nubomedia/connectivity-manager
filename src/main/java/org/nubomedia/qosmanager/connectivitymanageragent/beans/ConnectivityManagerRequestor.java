@@ -16,6 +16,7 @@
 package org.nubomedia.qosmanager.connectivitymanageragent.beans;
 
 import com.google.gson.Gson;
+import org.nubomedia.qosmanager.configurations.ConnectivityManagerConfiguration;
 import org.nubomedia.qosmanager.connectivitymanageragent.json.AddQueue;
 import org.nubomedia.qosmanager.connectivitymanageragent.json.*;
 import org.nubomedia.qosmanager.utils.ConfigReader;
@@ -37,7 +38,7 @@ import java.util.Properties;
 public class ConnectivityManagerRequestor {
 
     @Autowired private Gson mapper;
-    private Properties cmProp;
+    @Autowired private ConnectivityManagerConfiguration configuration;
     private Logger logger;
     private RestTemplate template;
 
@@ -45,11 +46,10 @@ public class ConnectivityManagerRequestor {
     private void init() throws IOException {
         this.logger = LoggerFactory.getLogger(this.getClass());
         this.template = new RestTemplate();
-        this.cmProp = ConfigReader.readProperties();
     }
 
     public Host getHost(){
-        String url = cmProp.getProperty("cmUrl") + "/hosts";
+        String url = configuration.getBaseUrl() + "/hosts";
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> getEntity = new HttpEntity<>(headers);
         ResponseEntity<String> hosts = template.exchange(url, HttpMethod.GET,getEntity,String.class);
@@ -67,7 +67,7 @@ public class ConnectivityManagerRequestor {
     public QosAdd setQoS(QosAdd qosRequest){
 
         logger.debug("SENDING REQUEST FOR " + mapper.toJson(qosRequest,QosAdd.class));
-        String url = cmProp.getProperty("cmUrl") + "/qoses";
+        String url = configuration.getBaseUrl() + "/qoses";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> setEntity = new HttpEntity<>(mapper.toJson(qosRequest,QosAdd.class),headers);
@@ -88,7 +88,7 @@ public class ConnectivityManagerRequestor {
     public Server getServerData(String hypervisorName, String serverName){
 
         logger.debug("Getting data for server " + serverName + " that belong to " + hypervisorName);
-        String url = cmProp.getProperty("cmUrl") + "/server/" + hypervisorName + "/" + serverName;
+        String url = configuration.getBaseUrl() + "/server/" + hypervisorName + "/" + serverName;
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> getEntity = new HttpEntity<>(headers);
         ResponseEntity<String> server = template.exchange(url,HttpMethod.GET,getEntity,String.class);
@@ -107,7 +107,7 @@ public class ConnectivityManagerRequestor {
 
     public HttpStatus delQos(String hypervisorName,String qosId){
 
-        String url = cmProp.getProperty("cmUrl") + "/qoses/" + hypervisorName + "/" + qosId;
+        String url = configuration.getBaseUrl() + "/qoses/" + hypervisorName + "/" + qosId;
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> delentity = new HttpEntity<>(headers);
         ResponseEntity<String> delete = template.exchange(url,HttpMethod.DELETE,delentity,String.class);
@@ -124,7 +124,7 @@ public class ConnectivityManagerRequestor {
 
     public HttpStatus delQueue(String hypervisorName, String qosId, String queueId, String queueNumber){
 
-        String url = cmProp.getProperty("cmUrl") + "/queue/" + hypervisorName + "/" + queueId + "/" + queueNumber + "/" + qosId;
+        String url = configuration.getBaseUrl() + "/queue/" + hypervisorName + "/" + queueId + "/" + queueNumber + "/" + qosId;
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> delQueueEntity = new HttpEntity<>(headers);
         ResponseEntity<String> delete = template.exchange(url,HttpMethod.DELETE,delQueueEntity,String.class);
@@ -136,7 +136,7 @@ public class ConnectivityManagerRequestor {
 
     public AddQueue addQueue (AddQueue add){
 
-        String url = cmProp.getProperty("cmUrl") + "/queue";
+        String url = configuration.getBaseUrl() + "/queue";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> postEntity = new HttpEntity<>(mapper.toJson(add,AddQueue.class),headers);
@@ -154,7 +154,7 @@ public class ConnectivityManagerRequestor {
 
     public RequestFlows setFlow(RequestFlows flow){
 
-        String url = cmProp.getProperty("cmUrl") + "/flow";
+        String url = configuration.getBaseUrl() + "/flow";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> flowEntity = new HttpEntity<>(mapper.toJson(flow,RequestFlows.class),headers);
@@ -173,7 +173,7 @@ public class ConnectivityManagerRequestor {
 
     public HttpStatus deleteFlow(String hypervisor_name, String flow_protocol,String flow_ip){
 
-        String url = cmProp.getProperty("cmUrl") + "/flow/" + hypervisor_name + "/" + flow_protocol + "/" + flow_ip;
+        String url = configuration.getBaseUrl() + "/flow/" + hypervisor_name + "/" + flow_protocol + "/" + flow_ip;
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> deleteFlowEntity = new HttpEntity<>(headers);
         ResponseEntity<String> deleteResponse = template.exchange(url,HttpMethod.DELETE,deleteFlowEntity,String.class);
