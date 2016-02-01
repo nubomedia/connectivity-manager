@@ -16,7 +16,7 @@ _tag="develop"
 
 _base=/opt
 _connectivity_manager_base="${_base}/nubomedia"
-_connectivity_manager="${_connectivty_manager_base}/connectivty-manager"
+_connectivity_manager="${_connectivity_manager_base}/connectivity-manager"
 _log_folder=/var/log/nubomedia
 
 _user="$(id -un 2>/dev/null || true)"
