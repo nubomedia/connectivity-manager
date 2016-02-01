@@ -89,6 +89,7 @@ function checkoutConnectivityManager {
     pushd "${_connectivity_manager}"
     git checkout ${_tag}
     popd
+    $_ex 'mkdir -p "/etc/nubomedia"'
     echo "created properties folder"
     $_ex 'cp '"${_connectivity_manager}/src/main/resources/qos.properties /etc/nubomedia/qos.properties"
     echo "copied properties file, now modifing..."
