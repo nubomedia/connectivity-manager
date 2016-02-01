@@ -61,7 +61,7 @@ public class OpenbatonEventSubscription {
     private void init() throws SDKException, IOException {
 
         this.logger = LoggerFactory.getLogger(this.getClass());
-        this.requestor = new NFVORequestor("", "", configuration.getBaseURL(), configuration.getBasePort(), "1");
+        this.requestor = new NFVORequestor(configuration.getUsername(), configuration.getPassword(), configuration.getBaseURL(), configuration.getBasePort(), "1");
         this.eventIds = new ArrayList<>();
 
         EventEndpoint eventEndpointCreation = new EventEndpoint();

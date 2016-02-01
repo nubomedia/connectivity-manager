@@ -74,6 +74,12 @@ function compileProperties {
          $_ex 'sed -i "s/nfvo.username=admin/nfvo.username=$nfvoUsername/g" /etc/nubomedia/qos.properties'
     fi
 
+    export brokerIp
+    read -p "Enter the nfvo rabbit broker ip [localhost]: " brokerIp
+    if [[ $nfvoUsername != "" ]]; then
+        $_ex 'sed -i "s/spring.rabbitmq.host=localhost/spring.rabbitmq.host=$brokerIp/g" /etc/nubomedia/qos.properties'
+    fi
+
     export nfvoPassword
     read -p "Enter the Orchestrator password [openbaton]: " nfvoPassword
     if [[ $nfvoPassword != "" ]]; then
