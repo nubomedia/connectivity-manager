@@ -16,7 +16,7 @@ _tag="develop"
 
 _base=/opt
 _connectivity_manager_base="${_base}/nubomedia"
-_connectivty_manager="${_connectivty_manager_base}/connectivty-manager"
+_connectivity_manager="${_connectivty_manager_base}/connectivty-manager"
 _log_folder=/var/log/nubomedia
 
 _user="$(id -un 2>/dev/null || true)"
@@ -45,7 +45,7 @@ function createConnectivityManagerBase {
     echo "Creating the Connectivity Manager base folder"
     # removing it if exists
     #$_ex 'rm -rf '$__connectivity_manager_base
-    $_ex 'mkdir -p '$_connectivty_manager
+    $_ex 'mkdir -p '$_connectivity_manager
     $_ex 'chown -R '"$_user $_connectivity_manager_base"
 
     # create log folder and give permission
@@ -85,19 +85,19 @@ function compileProperties {
 function checkoutConnectivityManager {
     echo "Getting the Connectivity Manager..."
     createConnectivityManagerBase
-    git clone --recursive "${_connectivity_manager_base_repo}" "${_connectivty_manager}"
-    pushd "${_connectivty_manager}"
+    git clone --recursive "${_connectivity_manager_base_repo}" "${_connectivity_manager}"
+    pushd "${_connectivity_manager}"
     git checkout ${_tag}
     popd
     echo "created properties folder"
-    $_ex 'cp '"${_connectivty_manager}/src/main/resources/qos.properties /etc/nubomedia/qos.properties"
+    $_ex 'cp '"${_connectivity_manager}/src/main/resources/qos.properties /etc/nubomedia/qos.properties"
     echo "copied properties file, now modifing..."
 }
 
 function compileConnectivityManager {
     echo "compiling the Nubomedia PaaS API"
-    pushd "${_connectivty_manager}"
-    ./connectivty-manager.sh compile
+    pushd "${_connectivity_manager}"
+    ./connectivity-manager.sh compile
     if [ $? -ne 0 ]; then
         echo "ERROR: The compilation of the Connectivity Manager failed"
         exit 1
@@ -105,16 +105,16 @@ function compileConnectivityManager {
     popd
 }
 
-function startNubomediaPaaS {
+function startConnectivityManager {
     echo "starting the Nubomedia PaaS API"
-    pushd ${_connectivty_manager}
-    ./connectivty-manager.sh start
+    pushd ${_connectivity_manager}
+    ./connectivity-manager.sh start
     popd
 }
 
 function deployConnectivityManager {
     compileConnectivityManager
-    startNubomediaPaaS
+    startConnectivityManager
 }
 
 function bootstrap {
