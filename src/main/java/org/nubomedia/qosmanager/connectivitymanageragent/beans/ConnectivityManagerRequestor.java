@@ -71,6 +71,7 @@ public class ConnectivityManagerRequestor {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> setEntity = new HttpEntity<>(mapper.toJson(qosRequest,QosAdd.class),headers);
+        logger.debug("SENDING QOS " + mapper.toJson(qosRequest,QosAdd.class));
         ResponseEntity<String> insert = template.exchange(url,HttpMethod.POST,setEntity,String.class);
 
         logger.debug("Setting of QoS has produced http status:" + insert.getStatusCode() + " with body: " + insert.getBody());
@@ -158,6 +159,7 @@ public class ConnectivityManagerRequestor {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> flowEntity = new HttpEntity<>(mapper.toJson(flow,RequestFlows.class),headers);
+        logger.debug("SENDING FLOWS " + mapper.toJson(flow,RequestFlows.class));
         ResponseEntity<String> addFlow = template.exchange(url,HttpMethod.POST,flowEntity,String.class);
 
         logger.debug("FLOW RESPONSE: sent flow configuration " + flow.toString() + " and received " + addFlow.getBody());
