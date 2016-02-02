@@ -52,6 +52,7 @@ public class ConnectivityManagerRequestor {
         String url = configuration.getBaseUrl() + "/hosts";
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> getEntity = new HttpEntity<>(headers);
+        logger.debug("REQUESTING HOSTS to " + url);
         ResponseEntity<String> hosts = template.exchange(url, HttpMethod.GET,getEntity,String.class);
 
         logger.debug("hosts " + hosts.getBody());

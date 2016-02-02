@@ -15,8 +15,12 @@
 
 package org.nubomedia.qosmanager.configurations;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Created by maa on 01.02.16.
@@ -26,6 +30,7 @@ import org.springframework.stereotype.Service;
 public class ConnectivityManagerConfiguration {
 
     private String baseUrl;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public String getBaseUrl() {
         return baseUrl;
@@ -33,5 +38,12 @@ public class ConnectivityManagerConfiguration {
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
+    }
+
+    @PostConstruct
+    private void init(){
+
+        logger.debug("CM BASEURL IS " + baseUrl);
+
     }
 }
