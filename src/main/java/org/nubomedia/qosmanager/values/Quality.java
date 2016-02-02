@@ -20,9 +20,9 @@ package org.nubomedia.qosmanager.values;
  */
 public enum Quality {
 
-    GOLD ("1000000","500000"),
-    SILVER ("500000","250000"),
-    BRONZE ("250000","125000");
+    GOLD ("10000000","5000000"),
+    SILVER ("5000000","2500000"),
+    BRONZE ("2500000","1250000");
 
     private String max_rate;
     private String min_rate;
