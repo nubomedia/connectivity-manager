@@ -57,7 +57,7 @@ function createConnectivityManagerBase {
 function compileProperties {
 
     export baseUrl
-    read -p "Enter the Connectivity Manager Agent ip [https://localhost:8091]: " baseUrl
+    read -p "Enter the Connectivity Manager Agent ip [http://localhost:8091]: " baseUrl
     if [[ "$baseUrl" != "" ]]; then
         $_ex 'sed -i "s|connectivitymanager.baseUrl=http://localhost:8091|connectivitymanager.baseUrl=$baseUrl|g" /etc/nubomedia/qos.properties'
     fi
