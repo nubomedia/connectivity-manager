@@ -22,7 +22,7 @@ The [bootstrap] repository contains the script to install and start the Connecti
 In order to do it you can run the following command:
 
 ```bash
-bash <(curl -fsSkl https://raw.githubusercontent.com/tub-nubomedia/connectivity-manager/develop/bootstrap)
+bash <(curl -fsSkl https://raw.githubusercontent.com/nubomedia/connectivity-manager/master/bootstrap)
 ```
 
 Afterwards the source code of the Connectivity-Manager is located in `/opt/nubomedia/connectivity-manager`.
@@ -35,7 +35,7 @@ In case the Connectivity-Manager are already installed you can start them manual
 1. Download the source code from git:
 
 ```bash
-git clone https://github.com/tub-nubomedia/connectivity-manager.git
+git clone https://github.com/nubomedia/connectivity-manager.git
 ```
 
 2. Change the properties file to reflect your infrastructure configuration:
@@ -95,10 +95,10 @@ Do you want to contribute? Great! [Write us](mailto:nubomedia@av.tu-berlin.de)!.
 
 
 [orchestrator]:http://openbaton.github.io
-[vnfm]:https://github.com/tub-nubomedia/ms-vnfm
+[vnfm]:https://github.com/nubomedia/nubomedia-msvnfm
 [spring.io]:https://spring.io/
-[cma]:https://github.com/tub-nubomedia/connectivity-manager-agent.git
-[bootstrap]:https://raw.githubusercontent.com/tub-nubomedia/connectivity-manager/develop/bootstrap
+[cma]:https://github.com/nubomedia/connectivity-manager-agent.git
+[bootstrap]:https://raw.githubusercontent.com/nubomedia/connectivity-manager/master/bootstrap
 [NFV MANO]:http://www.etsi.org/deliver/etsi_gs/NFV-MAN/001_099/001/01.01.01_60/gs_nfv-man001v010101p.pdf
 [nubomedia]:https://www.nubomedia.eu
 [LICENSE]:./LICENSE
