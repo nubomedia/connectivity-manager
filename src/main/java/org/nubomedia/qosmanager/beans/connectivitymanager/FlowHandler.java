@@ -16,22 +16,31 @@
 package org.nubomedia.qosmanager.beans.connectivitymanager;
 
 import org.nubomedia.qosmanager.connectivitymanageragent.beans.ConnectivityManagerRequestor;
-import org.nubomedia.qosmanager.connectivitymanageragent.json.*;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.Flow;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.FlowServer;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.Host;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.InterfaceQoS;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.RequestFlows;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.Server;
 import org.nubomedia.qosmanager.openbaton.FlowAllocation;
 import org.nubomedia.qosmanager.openbaton.FlowReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Created by maa on 09.12.15.
  */
 @Service
+@Scope ("prototype")
 public class FlowHandler {
 
     @Autowired private ConnectivityManagerRequestor requestor;
@@ -43,12 +52,13 @@ public class FlowHandler {
     private void init(){
 
         this.logger = LoggerFactory.getLogger(this.getClass());
-        this.protocol = "tcp";
+        this.protocol = "udp";
         this.priority = "2";
 
     }
 
-    public void createFlows(Host host, List<Server> servers, FlowAllocation allocations){
+    public void createFlows(Host host, List<Server> servers, FlowAllocation allocations, String nsrId){
+        logger.info("[FLOW-HANDLER] CREATING flows for " + nsrId + " at time " + new Date().getTime());
         logger.debug("Received Flow allocation " + allocations.toString());
         List<FlowServer> flows = new ArrayList<>();
         for (String vlr : allocations.getAllVlr()){
@@ -65,6 +75,7 @@ public class FlowHandler {
                                 Flow tmp = new Flow();
                                 tmp.setDest_ipv4(ip);
                                 Server dest = this.getServerRefFromIp(servers,ip);
+                                tmp.setDest_hyp(host.belongsTo(dest.getName()));
                                 tmp.setOvs_port_number(dest.getFromIp(ip).getOvs_port_number());
                                 tmp.setPriority(priority);
                                 tmp.setProtocol(protocol);
@@ -83,18 +94,28 @@ public class FlowHandler {
         logger.debug("REQUEST is " + request.toString());
         RequestFlows returningFlows = requestor.setFlow(request);
         logger.debug("Returning flows " + returningFlows.toString());
+        logger.info("[FLOW-HANDLER] CREATED queues for " + nsrId + " at time " + new Date().getTime());
     }
 
-    public void removeFlows(Host hostmap, List<String> serversIds, List<Server> servers){
+    public void removeFlows(Host hostmap, List<String> serversIds, List<Server> servers, String nsrId){
+
+        logger.info("[FLOW-HANDLER] REMOVING queues for " + nsrId + " at time " + new Date().getTime());
 
         for(Server server : servers){
-            if (serversIds.contains(server.getName())){
+            boolean contains = false;
+            for (String id : serversIds) {
+                if (server.getName().contains(id)) {
+                    contains = true;
+                }
+            }
+            if (contains){
                 String hypervisor = hostmap.belongsTo(server.getName());
                 for  (InterfaceQoS iface : server.getInterfaces()){
                     requestor.deleteFlow(hypervisor,protocol,iface.getIp());
                 }
             }
         }
+        logger.info("[FLOW-HANDLER] REMOVED queues for " + nsrId + " at time " + new Date().getTime());
     }
 
     private Server getServerRefFromIp (List<Server> servers, String ip){

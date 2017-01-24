@@ -15,8 +15,12 @@
 
 package org.nubomedia.qosmanager.configurations;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Created by maa on 01.02.16.
@@ -29,6 +33,8 @@ public class NfvoConfiguration {
     private String basePort;
     private String username;
     private String password;
+    private boolean security;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public String getBaseURL() {
         return baseURL;
@@ -60,5 +66,20 @@ public class NfvoConfiguration {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isSecurity() {
+        return security;
+    }
+
+    public void setSecurity(boolean security) {
+        this.security = security;
+    }
+
+    @PostConstruct
+    private void init(){
+
+        logger.debug("OBBASEURL IS " + baseURL + " OBPORT IS " + basePort + " USERNAME " + username + " PASSWORD " + password);
+
     }
 }

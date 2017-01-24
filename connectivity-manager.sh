@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 source ./gradle.properties
 
 _version=${version}
@@ -35,7 +33,7 @@ function start {
 	#screen -c screenrc -d -m -S ms-vnfm -t ms-vnfm java -jar "build/libs/ms-vnfm-$_version.jar"
 	pushd "${_connectivity_manager_base}"
 	#                                                                   build/libs/nubomedia-paas-api-0.1-SNAPSHOT.jar
-	screen -d -m -S connectivity-manager -t connectivity-manager java -jar "/opt/nubomedia/connectivity-manager/build/libs/connectivity-manager-$_version.jar" --spring.config.location=file:${_connectivity_manager_config_file}
+	screen -d -m -S connectivity-manager -t connectivity-manager java -Xmx64m -Xss256k -jar "/opt/nubomedia/connectivity-manager/build/libs/connectivity-manager-$_version.jar" --spring.config.location=file:${_connectivity_manager_config_file}
 	    #screen -c screenrc -r -p 0
 	popd
     #fi

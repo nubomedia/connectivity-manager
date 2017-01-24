@@ -16,23 +16,34 @@
 package org.nubomedia.qosmanager.beans.connectivitymanager;
 
 import org.nubomedia.qosmanager.connectivitymanageragent.beans.ConnectivityManagerRequestor;
-import org.nubomedia.qosmanager.connectivitymanageragent.json.*;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.Host;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.InterfaceQoS;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.Qos;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.QosAdd;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.QosQueue;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.QosQueueValues;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.Server;
+import org.nubomedia.qosmanager.connectivitymanageragent.json.ServerQoS;
 import org.nubomedia.qosmanager.openbaton.QoSAllocation;
 import org.nubomedia.qosmanager.openbaton.QoSReference;
 import org.nubomedia.qosmanager.values.Quality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Created by maa on 09.12.15.
  */
 @Service
+@Scope ("prototype")
 public class QoSHandler {
 
     @Autowired private ConnectivityManagerRequestor requestor;
@@ -43,8 +54,9 @@ public class QoSHandler {
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
-    public List<Server> createQueues(Host hostMap, List<QoSAllocation> queues){
+    public List<Server> createQueues(Host hostMap, List<QoSAllocation> queues, String nsrId){
 
+        logger.info("[QOS-HANDLER] CREATING queues for " + nsrId + " at time " + new Date().getTime());
         logger.debug("received request for " + queues.toString());
 
         List<ServerQoS> queuesReq = new ArrayList<>();
@@ -67,7 +79,7 @@ public class QoSHandler {
         add = requestor.setQoS(add);
 
         servers = this.updateServers(servers, add);
-
+        logger.info("[QOS-HANDLER] CREATED queues for " + nsrId + " at time " + new Date().getTime());
         return servers;
     }
 
@@ -117,10 +129,17 @@ public class QoSHandler {
         return serverIface;
     }
 
-    public void removeQos(Host hostMap, List<Server> servers, List<String> serverIds){
+    public void removeQos(Host hostMap, List<Server> servers, List<String> serverIds, String nsrId){
 
+        logger.info("[QOS-HANDLER] REMOVING queues for " + nsrId + " at time " + new Date().getTime());
         for (Server server :servers){
-            if (serverIds.contains(server.getName())){
+            boolean contains = false;
+            for (String id : serverIds) {
+                if (server.getName().contains(id)) {
+                    contains = true;
+                }
+            }
+            if (contains){
                 String hypervisor = hostMap.belongsTo(server.getName());
                 for (InterfaceQoS iface : server.getInterfaces()){
                     Qos ifaceQoS = iface.getQos();
@@ -128,6 +147,7 @@ public class QoSHandler {
                 }
             }
         }
+        logger.info("[QOS-HANDLER] REMOVED queues for " + nsrId + " at time " + new Date().getTime());
 
     }
 

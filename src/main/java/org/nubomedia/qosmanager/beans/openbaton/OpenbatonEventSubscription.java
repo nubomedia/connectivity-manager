@@ -17,6 +17,7 @@ package org.nubomedia.qosmanager.beans.openbaton;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import org.nubomedia.qosmanager.beans.connectivitymanager.ConnectivityManagerHandler;
 import org.nubomedia.qosmanager.configurations.NfvoConfiguration;
 import org.nubomedia.qosmanager.openbaton.OpenbatonEvent;
 import org.nubomedia.qosmanager.utils.ConfigReader;
@@ -33,19 +34,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.CommandLineRunner;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by maa on 11.11.15.
  */
 @Service
-public class OpenbatonEventSubscription {
+public class OpenbatonEventSubscription implements CommandLineRunner{
 
     private NFVORequestor requestor;
     private Logger logger;
@@ -57,11 +63,13 @@ public class OpenbatonEventSubscription {
     private List<String> eventIds;
 
 
-    @PostConstruct
+    
     private void init() throws SDKException, IOException {
 
         this.logger = LoggerFactory.getLogger(this.getClass());
-        this.requestor = new NFVORequestor(configuration.getUsername(), configuration.getPassword(), configuration.getBaseURL(), configuration.getBasePort(), "1");
+
+        this.requestor = new NFVORequestor(configuration.getUsername(), configuration.getPassword(), "*", false, configuration.getBaseURL(), configuration.getBasePort(), "1");
+
         this.eventIds = new ArrayList<>();
 
         EventEndpoint eventEndpointCreation = new EventEndpoint();
@@ -84,7 +92,7 @@ public class OpenbatonEventSubscription {
     }
 
     public void receiveNewNsr(String message) {
-        logger.info("received new event " + message);
+        logger.debug("received new event " + message);
         OpenbatonEvent evt;
 
         try {
@@ -97,6 +105,8 @@ public class OpenbatonEventSubscription {
                 logger.warn("Error in payload, expected NSR " + e.getMessage());
             return;
         }
+
+        logger.info("[OPENBATON-EVENT-SUBSCRIPTION] received new NSR " + evt.getPayload().getId() + "for slice allocation at time " + new Date().getTime());
 
         logger.debug("Deserialized!!!");
         logger.debug("ACTION: " + evt.getAction() + " PAYLOAD: " + evt.getPayload().toString());
@@ -113,6 +123,7 @@ public class OpenbatonEventSubscription {
                         logger.debug("QoS Attribute: " + qosAttr);
                         if (qosAttr.contains("minimum_bandwith")) {
                             logger.debug("FOUND QOS ATTR WITH QOS: " + qosAttr);
+                            logger.info("[OPENBATON-EVENT-SUBSCRIPTION] sending the NSR " + evt.getPayload().getId() + "for slice allocation to nsr handler at time " + new Date().getTime());
                             creator.addQos(nsr.getVnfr(), nsr.getId());
                             break vnfrloop;
                         }
@@ -120,11 +131,12 @@ public class OpenbatonEventSubscription {
                 }
             }
         }
+        logger.info("[OPENBATON-EVENT-SUBSCRIPTION] Ended message callback function at " + new Date().getTime());
     }
 
     public void deleteNsr(String message){
 
-        logger.info("received new event " + message);
+        logger.debug("received new event " + message);
         OpenbatonEvent evt;
 
         try {
@@ -138,6 +150,8 @@ public class OpenbatonEventSubscription {
             return;
         }
 
+
+        logger.info("[OPENBATON-EVENT-SUBSCRIPTION] received new NSR " + evt.getPayload().getId() + "for slice removal at time " + new Date().getTime());
         logger.debug("Deserialized!!!");
         logger.debug("ACTION: " + evt.getAction() + " PAYLOAD " + evt.getPayload().toString());
         NetworkServiceRecord nsr = evt.getPayload();
@@ -151,6 +165,7 @@ public class OpenbatonEventSubscription {
                     for (String qosAttr : vlr.getQos()) {
                         if (qosAttr.contains("minimum_bandwith")) {
                             logger.debug("FOUND QOS ATTR WITH QOS: " + qosAttr);
+                            logger.info("[OPENBATON-EVENT-SUBSCRIPTION] sending the NSR " + evt.getPayload().getId() + "for slice removal to nsr handler at time " + new Date().getTime());
                             creator.removeQos(nsr.getVnfr(), nsr.getId());
                             break vnfrloop;
                         }
@@ -166,4 +181,10 @@ public class OpenbatonEventSubscription {
             requestor.getEventAgent().delete(id);
         }
     }
+public void run(String... args) throws Exception{
+         init();
+    }
+
+ 
+
 }

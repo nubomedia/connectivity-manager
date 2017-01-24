@@ -48,7 +48,6 @@ public class ConfigurationBeans {
     public static final String queueName_eventInstatiateFinish = "nfvo.qos.nsr.create";
     public static final String queueName_eventResourcesReleaseFinish = "nfvo.qos.nsr.delete";
     private Logger logger;
-    @Autowired private Environment env;
 
     @PostConstruct
     private void init(){
